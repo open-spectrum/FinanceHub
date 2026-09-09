@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Focus Hub</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#090a13;--panel:#151522e8;--panel2:#ffffff0d;--border:#ffffff1c;
+  --text:#fff;--muted:#aaa5b5;--purple:#9270dc;--purple2:#b496ff;
+}
+html,body{min-height:100%}
+body{
+  margin:0;color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 50% 20%,#35245155,transparent 38%),
+    radial-gradient(circle at 85% 70%,#20205244,transparent 35%),
+    linear-gradient(135deg,#171525,#080912 70%);
+  background-size:cover;background-position:center;background-attachment:fixed;
+}
+body.has-bg{background-color:#080912;background-image:linear-gradient(#0007,#0007),var(--custom-bg)}
+button,input,select{font:inherit}button{color:inherit}
+header{
+  min-height:82px;padding:18px 34px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid #ffffff0b;
+  backdrop-filter:blur(14px);background:#08091255
+}
+.brand{font-size:20px;font-weight:800}.brand span{color:var(--purple2)}
+.header-actions{display:flex;gap:9px}
+.icon-btn{
+  width:42px;height:42px;border:1px solid var(--border);border-radius:12px;
+  background:#ffffff0c;cursor:pointer
+}
+main{width:min(1250px,calc(100% - 40px));margin:auto;padding:28px 0 70px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}
+.toolbar h1{font-size:25px;margin:0}.toolbar p{color:var(--muted);font-size:13px;margin:5px 0 0}
+.primary{
+  border:1px solid #c5b1ff;border-radius:14px;padding:12px 17px;
+  background:var(--purple);font-weight:800;cursor:pointer;box-shadow:0 0 25px #9874df44
+}
+.secondary{border:1px solid #ffffff1d;background:#ffffff0b;border-radius:11px;padding:11px 16px;cursor:pointer}
+.danger{border:1px solid #ff7c7c55;background:#ff4d4d12;color:#ffaaa7}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:28px 0 13px}
+.section-title h2{font-size:14px;text-transform:uppercase;letter-spacing:1.3px;margin:0;color:#cbc5d4}
+.section-title span{font-size:12px;color:#888294}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{
+  position:relative;overflow:hidden;border:1px solid var(--border);border-radius:20px;
+  padding:19px;background:linear-gradient(145deg,#191827e8,#0f101bdc);box-shadow:0 15px 40px #0004
+}
+.card-top{display:flex;justify-content:space-between;gap:10px}.card-title{font-size:17px;font-weight:750;margin:0}
+.card-description{font-size:12px;color:var(--muted);margin:5px 0 0;min-height:17px}
+.menu-btn{border:0;background:transparent;color:#9d97a8;font-size:20px;cursor:pointer}
+.card-progress{height:5px;background:#ffffff12;border-radius:10px;margin:17px 0 18px;overflow:hidden}
+.card-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),#c4afff);border-radius:10px}
+.units{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.unit{text-align:center;background:#ffffff08;border:1px solid #ffffff0d;border-radius:12px;padding:11px 4px}
+.value{display:block;font-size:25px;font-weight:750;font-variant-numeric:tabular-nums}
+.unit small{display:block;color:#918b9e;font-size:9px;text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
+.dates{display:flex;justify-content:space-between;margin-top:13px;color:#777181;font-size:10px}
+.card-footer{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
+.small-btn{border:1px solid #ffffff16;background:#ffffff08;border-radius:9px;padding:7px 10px;font-size:11px;cursor:pointer}
+
+.streak-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.streak-card{
+  border:1px solid var(--border);border-radius:20px;padding:18px;
+  background:linear-gradient(145deg,#1b1829e8,#10111cdc);box-shadow:0 15px 40px #0004
+}
+.streak-head{display:flex;justify-content:space-between;gap:10px}.streak-title{margin:0;font-size:16px}
+.streak-legend{margin:5px 0 17px;color:var(--muted);font-size:12px}
+.streak-number{font-size:42px;font-weight:850;line-height:1;font-variant-numeric:tabular-nums}
+.streak-number small{font-size:13px;color:#9e98a8;font-weight:600}
+.streak-meta{font-size:10px;color:#777181;margin-top:8px}
+.streak-actions{display:flex;gap:7px;margin-top:15px}.streak-actions button{flex:1}
+.today{border-color:#c5b1ff;background:#9270dc22}
+
+.sites-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.category-filter{
+  border:1px solid var(--border);background:#ffffff09;color:#ddd7e5;
+  border-radius:10px;padding:8px 10px;outline:none
+}
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.site{
+  position:relative;min-height:130px;border:1px solid var(--border);border-radius:17px;
+  background:#ffffff09;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:9px;cursor:pointer;text-decoration:none;color:#fff;transition:.15s
+}
+.site:hover{background:#ffffff13;transform:translateY(-2px)}
+.site-icon{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:#292a38;font-size:19px;font-weight:800}
+.site-name{font-size:12px;color:#c3bdca;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.site-category{font-size:9px;color:#817a8d;text-transform:uppercase;letter-spacing:.6px}
+.site-actions{position:absolute;top:7px;right:7px;display:flex;gap:3px;opacity:0;transition:.15s}
+.site:hover .site-actions{opacity:1}.site-actions button{border:0;background:#0008;border-radius:7px;padding:4px 6px;cursor:pointer}
+.add-site{border:1px dashed #ffffff2c;background:#ffffff06}
+.empty{border:1px dashed #ffffff20;border-radius:18px;padding:30px;text-align:center;color:#8d8797}
+.full-empty{grid-column:1/-1}
+
+.modal-bg{
+  display:none;position:fixed;inset:0;background:#0009;backdrop-filter:blur(8px);
+  z-index:10;align-items:center;justify-content:center;padding:20px
+}
+.modal{width:min(520px,100%);max-height:90vh;overflow:auto;background:#151522;border:1px solid #ffffff22;border-radius:22px;padding:23px;box-shadow:0 30px 80px #0009}
+.modal h2{margin:0 0 18px;font-size:19px}.field{margin:13px 0}
+.field label{display:block;color:#aaa3b4;font-size:11px;text-transform:uppercase;letter-spacing:.7px;margin:0 0 6px}
+.field input,.field select{
+  width:100%;padding:12px;border-radius:11px;border:1px solid #ffffff1f;
+  background:#0d0e18;color:#fff;outline:none
+}
+.field input:focus,.field select:focus{border-color:var(--purple)}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.file-note{font-size:10px;color:#888294;margin-top:6px;line-height:1.5}
+.category-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.category-pill{
+  display:flex;align-items:center;gap:6px;background:#ffffff09;border:1px solid #ffffff16;
+  border-radius:20px;padding:6px 9px;font-size:11px
+}.category-pill button{border:0;background:transparent;cursor:pointer;color:#aaa}
+
+.audio-status{font-size:11px;color:#aaa3b4;margin-top:8px}
+.music-list{display:flex;flex-direction:column;gap:7px;max-height:180px;overflow:auto;margin-top:10px}
+.music-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #ffffff12;border-radius:10px}
+.music-row span{flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.music-row button{border:0;background:transparent;cursor:pointer}
+
+
+.finance-table-wrap{
+  width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:20px;
+  background:linear-gradient(145deg,#191827e8,#0f101bdc);box-shadow:0 15px 40px #0004
+}
+.finance-table{width:100%;border-collapse:collapse;min-width:720px}
+.finance-table th{
+  padding:14px 16px;text-align:left;color:#918b9e;font-size:10px;
+  text-transform:uppercase;letter-spacing:.9px;border-bottom:1px solid #ffffff12
+}
+.finance-table td{
+  padding:14px 16px;color:#ddd7e5;font-size:12px;border-bottom:1px solid #ffffff0b
+}
+.finance-table tbody tr:last-child td{border-bottom:0}
+.finance-table tbody tr:hover{background:#ffffff06}
+.finance-title{font-weight:750;color:#fff}
+.finance-description{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.finance-value{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.income-value{color:#65d99a}
+.expense-value{color:#ff7777}
+.finance-tag{
+  display:inline-block;padding:5px 8px;border-radius:9px;background:#ffffff09;
+  border:1px solid #ffffff12;color:#bcb5c8;font-size:10px
+}
+.finance-actions{display:flex;gap:6px;justify-content:flex-end}
+
+@media(max-width:650px){
+  header{padding:16px;height:72px}.header-actions .icon-btn:nth-child(-n+2){display:none}
+  main{width:min(100% - 24px,1250px);padding-top:20px}.toolbar{align-items:flex-start}
+  .toolbar p{max-width:220px}.primary{padding:10px 12px;font-size:12px}
+  .grid{grid-template-columns:1fr}.sites-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Finance <span>Hub</span></div>
+  <div class="header-actions">
+    <button class="icon-btn" onclick="toggleTheme()" title="Alternar brilho">◐</button>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div>
+      <h1>Meu painel financeiro</h1>
+      <p>Controle seu saldo, gastos e entradas em um só lugar.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <button class="secondary" onclick="openBalanceModal()">＋ Novo saldo</button>
+      <button class="primary" onclick="openExpenseModal()">＋ Novo gasto</button>
+    </div>
+  </div>
+
+  <div class="section-title"><h2>💰 Resumo</h2><span id="summaryMonth"></span></div>
+  <div class="grid">
+    <article class="card">
+      <div class="card-top"><div><h3 class="card-title">Saldo total</h3><p class="card-description">Resultado de todas as entradas e gastos.</p></div><span style="font-size:25px">◈</span></div>
+      <div class="streak-number income-value" id="totalBalance">R$ 0,00</div>
+    </article>
+    <article class="card">
+      <div class="card-top"><div><h3 class="card-title">Total em gastos</h3><p class="card-description">Soma dos gastos cadastrados.</p></div><span style="font-size:25px">↘</span></div>
+      <div class="streak-number expense-value" id="totalExpenses">R$ 0,00</div>
+    </article>
+    <article class="card">
+      <div class="card-top"><div><h3 class="card-title">Total adicionado</h3><p class="card-description">Soma dos novos saldos adicionados.</p></div><span style="font-size:25px">↗</span></div>
+      <div class="streak-number" id="totalIncome">R$ 0,00</div>
+    </article>
+  </div>
+
+  <div class="section-title">
+    <h2>🧾 Gastos</h2>
+    <div class="sites-toolbar">
+      <select id="expenseFilter" class="category-filter" onchange="renderExpenses()">
+        <option value="*">Todos</option>
+      </select>
+      <button class="secondary" onclick="openExpenseModal()">＋ Gasto</button>
+    </div>
+  </div>
+  <div id="expenses" class="grid"></div>
+
+  <div class="section-title">
+    <h2>💳 Entradas de saldo</h2>
+    <button class="secondary" onclick="openBalanceModal()">＋ Adicionar saldo</button>
+  </div>
+  <div id="balances" class=""></div>
+</main>
+
+<!-- Gasto -->
+<div class="modal-bg" id="expenseModal"><div class="modal">
+  <h2 id="expenseModalTitle">Novo gasto</h2>
+  <input id="expenseId" type="hidden">
+  <div class="field"><label>Título</label><input id="expenseTitle" placeholder="Ex.: Mercado"></div>
+  <div class="field"><label>Descrição</label><input id="expenseDescription" placeholder="Ex.: Compras da semana"></div>
+  <div class="field"><label>Valor</label><input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0,00"></div>
+  <div class="field"><label>Categoria</label><input id="expenseCategory" placeholder="Ex.: Alimentação"></div>
+  <div class="field"><label>Data</label><input id="expenseDate" type="date"></div>
+  <div class="modal-actions">
+    <button class="secondary" onclick="closeModal('expenseModal')">Cancelar</button>
+    <button class="primary" onclick="saveExpense()">Salvar gasto</button>
+  </div>
+</div></div>
+
+<!-- Saldo -->
+<div class="modal-bg" id="balanceModal"><div class="modal">
+  <h2 id="balanceModalTitle">Adicionar novo saldo</h2>
+  <input id="balanceId" type="hidden">
+  <div class="field"><label>Título</label><input id="balanceTitle" placeholder="Ex.: Mesada / salário"></div>
+  <div class="field"><label>Descrição</label><input id="balanceDescription" placeholder="Ex.: Valor recebido este mês"></div>
+  <div class="field"><label>Valor</label><input id="balanceAmount" type="number" min="0" step="0.01" placeholder="0,00"></div>
+  <div class="field"><label>Data</label><input id="balanceDate" type="date"></div>
+  <div class="modal-actions">
+    <button class="secondary" onclick="closeModal('balanceModal')">Cancelar</button>
+    <button class="primary" onclick="saveBalance()">Salvar saldo</button>
+  </div>
+</div></div>
+
+<script>
+const expensesEl=document.getElementById('expenses');
+const balancesEl=document.getElementById('balances');
+
+let expenses=load('financeExpenses',[]);
+let balances=load('financeBalances',[]);
+let settings=load('financeSettings',{brightness:false});
+
+function load(k,fallback){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(fallback))}catch{return fallback}}
+function saveAll(){
+  localStorage.setItem('financeExpenses',JSON.stringify(expenses));
+  localStorage.setItem('financeBalances',JSON.stringify(balances));
+  localStorage.setItem('financeSettings',JSON.stringify(settings));
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function localDateString(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function formatDate(v){if(!v)return '';const[y,m,d]=v.split('-');return `${d}/${m}/${y}`}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function closeModal(id){document.getElementById(id).style.display='none'}
+function openModal(id){document.getElementById(id).style.display='flex'}
+
+function openExpenseModal(id=null){
+  const x=id?expenses.find(e=>e.id==id):null;
+  expenseModalTitle.textContent=x?'Editar gasto':'Novo gasto';
+  expenseId.value=x?.id||'';
+  expenseTitle.value=x?.title||'';
+  expenseDescription.value=x?.description||'';
+  expenseAmount.value=x?.amount??'';
+  expenseCategory.value=x?.category||'';
+  expenseDate.value=x?.date||localDateString(new Date());
+  openModal('expenseModal');
+}
+function saveExpense(){
+  const title=expenseTitle.value.trim()||'Novo gasto';
+  const description=expenseDescription.value.trim();
+  const amount=Number(expenseAmount.value);
+  const category=expenseCategory.value.trim()||'Outros';
+  const date=expenseDate.value||localDateString(new Date());
+  if(!(amount>0)){alert('Informe um valor maior que zero.');return}
+  const data={title,description,amount,category,date};
+  if(expenseId.value)Object.assign(expenses.find(x=>x.id==expenseId.value),data);
+  else expenses.push({id:Date.now(),...data});
+  saveAll();render();closeModal('expenseModal');
+}
+function removeExpense(id){
+  if(confirm('Excluir este gasto?')){expenses=expenses.filter(x=>x.id!=id);saveAll();render()}
+}
+
+function openBalanceModal(id=null){
+  const x=id?balances.find(b=>b.id==id):null;
+  balanceModalTitle.textContent=x?'Editar saldo':'Adicionar novo saldo';
+  balanceId.value=x?.id||'';
+  balanceTitle.value=x?.title||'';
+  balanceDescription.value=x?.description||'';
+  balanceAmount.value=x?.amount??'';
+  balanceDate.value=x?.date||localDateString(new Date());
+  openModal('balanceModal');
+}
+function saveBalance(){
+  const title=balanceTitle.value.trim()||'Novo saldo';
+  const description=balanceDescription.value.trim();
+  const amount=Number(balanceAmount.value);
+  const date=balanceDate.value||localDateString(new Date());
+  if(!(amount>0)){alert('Informe um valor maior que zero.');return}
+  const data={title,description,amount,date};
+  if(balanceId.value)Object.assign(balances.find(x=>x.id==balanceId.value),data);
+  else balances.push({id:Date.now(),...data});
+  saveAll();render();closeModal('balanceModal');
+}
+function removeBalance(id){
+  if(confirm('Excluir esta entrada de saldo?')){balances=balances.filter(x=>x.id!=id);saveAll();render()}
+}
+
+function renderSummary(){
+  const income=balances.reduce((a,x)=>a+Number(x.amount||0),0);
+  const spent=expenses.reduce((a,x)=>a+Number(x.amount||0),0);
+  document.getElementById('totalIncome').textContent=money(income);
+  document.getElementById('totalExpenses').textContent=money(spent);
+  document.getElementById('totalBalance').textContent=money(income-spent);
+  document.getElementById('summaryMonth').textContent=`${expenses.length} gasto(s) • ${balances.length} entrada(s)`;
+}
+
+function renderExpenseFilter(){
+  const current=expenseFilter.value||'*';
+  const cats=[...new Set(expenses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  expenseFilter.innerHTML='<option value="*">Todos</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  if(cats.includes(current))expenseFilter.value=current;
+}
+function renderExpenses(){
+  renderExpenseFilter();
+  const filter=expenseFilter.value||'*';
+  const list=filter==='*'?expenses:expenses.filter(x=>x.category===filter);
+  if(!list.length){
+    expensesEl.innerHTML='<div class="empty full-empty">Nenhum gasto cadastrado ainda.<br>Use <b>＋ Novo gasto</b> para começar.</div>';return;
+  }
+  const rows=list.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`
+    <tr>
+      <td><span class="finance-title">${esc(x.title)}</span><span class="finance-description">${esc(x.description||'Sem descrição')}</span></td>
+      <td><span class="finance-tag">${esc(x.category)}</span></td>
+      <td>${formatDate(x.date)}</td>
+      <td><span class="finance-value expense-value">${money(x.amount)}</span></td>
+      <td><div class="finance-actions"><button class="small-btn" onclick="openExpenseModal(${x.id})">Editar</button><button class="small-btn danger" onclick="removeExpense(${x.id})">Excluir</button></div></td>
+    </tr>`).join('');
+  expensesEl.innerHTML=`<div class="finance-table-wrap"><table class="finance-table">
+    <thead><tr><th>Gasto</th><th>Categoria</th><th>Data</th><th>Valor</th><th style="text-align:right">Ações</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderBalances(){
+  if(!balances.length){
+    balancesEl.innerHTML='<div class="empty full-empty">Nenhuma entrada de saldo cadastrada.<br>Use <b>＋ Adicionar saldo</b> para começar.</div>';return;
+  }
+  const rows=balances.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`
+    <tr>
+      <td><span class="finance-title">${esc(x.title)}</span><span class="finance-description">${esc(x.description||'Sem descrição')}</span></td>
+      <td>Entrada</td>
+      <td>${formatDate(x.date)}</td>
+      <td><span class="finance-value income-value">${money(x.amount)}</span></td>
+      <td><div class="finance-actions"><button class="small-btn" onclick="openBalanceModal(${x.id})">Editar</button><button class="small-btn danger" onclick="removeBalance(${x.id})">Excluir</button></div></td>
+    </tr>`).join('');
+  balancesEl.innerHTML=`<div class="finance-table-wrap"><table class="finance-table">
+    <thead><tr><th>Entrada</th><th>Tipo</th><th>Data</th><th>Valor</th><th style="text-align:right">Ações</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function render(){renderSummary();renderExpenses();renderBalances()}
+
+function toggleTheme(){
+  settings.brightness=!settings.brightness;
+  document.body.style.filter=settings.brightness?'brightness(1.18)':'';
+  saveAll();
+}
+function restoreSettings(){document.body.style.filter=settings.brightness?'brightness(1.18)':''}
+
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.style.display='none'}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-bg').forEach(m=>m.style.display='none')});
+restoreSettings();render();
+</script>
+</body>
+</html>
